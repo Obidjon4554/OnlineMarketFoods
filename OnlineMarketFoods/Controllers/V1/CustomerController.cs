@@ -1,14 +1,16 @@
 ﻿using System.Net;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using OnlineMarketFoods.Dtos;
 using OnlineMarketFoods.Examples;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace OnlineMarketFoods.Controllers
+namespace OnlineMarketFoods.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{v:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1")]
 
     public class CustomerController : ControllerBase
     {
@@ -30,10 +32,8 @@ namespace OnlineMarketFoods.Controllers
             }
         ];
         [HttpGet]
-        [SwaggerOperation("GetCustomer")]
         [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(GetCustomerExamples))]
         [SwaggerResponseExample(201, typeof(GetCustomerExamples))]
-        [SwaggerResponse(201,"Got Customers Successfuly", typeof(IList<CustomerDto>))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Customer not found")]
 
         public async Task<IActionResult> GetAllCustomers()
@@ -42,10 +42,8 @@ namespace OnlineMarketFoods.Controllers
         }
 
         [HttpPost]
-        [SwaggerOperation("CreateCustomer")]
         [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(CreateCustomerExamples))]
         [SwaggerResponseExample(201, typeof(CreateCustomerExamples))]
-        [SwaggerResponse(201, "Customer Created Successfuly", typeof(IList<CustomerDto>))]
         [SwaggerResponse(400, "Bad Request")]
 
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerDto customerDto)

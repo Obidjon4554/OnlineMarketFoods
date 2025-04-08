@@ -1,20 +1,18 @@
-using System.Xml.Linq;
-using System;
+using System.Reflection;
+using Asp.Versioning;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using OnlineMarketFoods.Examples;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations();
-    options.ExampleFilters(); // This enables examples via Swashbuckle.Filters
+    options.ExampleFilters(); 
 
     options.SwaggerDoc("v1", new OpenApiInfo
     {
@@ -33,11 +31,65 @@ builder.Services.AddSwaggerGen(options =>
             Url = new Uri("https://marketfoods.readme.io/license")
         }
     });
+    options.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Title = "Online Market Foods API",
+        Version = "v2",
+        Description = "API for managing online market foods",
+        TermsOfService = new Uri("https://marketfoods.readme.io/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "Socials Team",
+            Url = new Uri("https://marketfoods.readme.io/contact")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Use under LICX",
+            Url = new Uri("https://marketfoods.readme.io/license")
+        }
+    });
+    options.SwaggerDoc("v3", new OpenApiInfo
+    {
+        Title = "Online Market Foods API",
+        Version = "v3",
+        Description = "API for managing online market foods",
+        TermsOfService = new Uri("https://marketfoods.readme.io/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "Socials Team",
+            Url = new Uri("https://marketfoods.readme.io/contact")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Use under LICX",
+            Url = new Uri("https://marketfoods.readme.io/license")
+        }
+    });
 });
 
 builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateCustomerExamples>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateOrderExamples>();
 builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateProductExamples>();
+builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetExecutingAssembly());
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    //options.ApiVersionReader = ApiVersionReader.Combine(
+    //    new QueryStringApiVersionReader("v"),
+    //    new HeaderApiVersionReader("X-Version"),
+    //    new MediaTypeApiVersionReader("x-api-version")
+    //    );
+})
+    .AddMvc()
+    .AddApiExplorer(options =>
+      {
+          options.GroupNameFormat = "'v'VVV";
+          options.SubstituteApiVersionInUrl = true;
+      });
+
 
 
 var app = builder.Build();
@@ -52,10 +104,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "OnlineMarketFoods API V1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "OnlineMarketFoods API V2");
+        options.SwaggerEndpoint("/swagger/v3/swagger.json", "OnlineMarketFoods API V3");
     });
     app.UseReDoc(options =>
     {
         options.SpecUrl = "/swagger/v1/swagger.json";
+        options.SpecUrl = "/swagger/v2/swagger.json";
+        options.SpecUrl = "/swagger/v3/swagger.json";
         options.RoutePrefix = "docs"; // Set the route prefix for ReDoc
     });
 }

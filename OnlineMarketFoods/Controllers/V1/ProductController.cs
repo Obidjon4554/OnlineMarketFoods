@@ -1,16 +1,19 @@
 ﻿using System.Net;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using OnlineMarketFoods.Dtos;
 using OnlineMarketFoods.Examples;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace OnlineMarketFoods.Controllers
+namespace OnlineMarketFoods.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{v:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1")]
     public class ProductController : ControllerBase
     {
+        
         private static readonly List<ProductDto> _products = new()
         {
             new ProductDto
@@ -30,10 +33,8 @@ namespace OnlineMarketFoods.Controllers
         };
 
         [HttpGet]
-        [SwaggerOperation("GetProduct")]
         [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(GetProductExamples))]
         [SwaggerResponseExample(201, typeof(GetProductExamples))]
-        [SwaggerResponse(201, "Got Products Successfuly", typeof(IList<ProductDto>))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Product not found")]
         public async Task<IActionResult> GetAllProducts()
         {
@@ -41,12 +42,10 @@ namespace OnlineMarketFoods.Controllers
         }
 
         [HttpPost]
-        [SwaggerOperation("CreateProduct")]
         [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(CreateProductExamples))]
         [SwaggerResponseExample(201, typeof(CreateProductExamples))]
-        [SwaggerResponse(201, "Product Created Successfuly", typeof(ProductDto))]
         [SwaggerResponse(400, "Bad Request")]
-        public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto)
+        public async Task<IActionResult> CreateProduct([FromBody, SwaggerRequestBody("The Product payload", Required = true)] CreateProductDto productDto)
         {
             if (productDto == null || string.IsNullOrWhiteSpace(productDto.Name))
                 return BadRequest("Invalid product data.");
