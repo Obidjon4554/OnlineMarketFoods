@@ -10,7 +10,7 @@ namespace OnlineMarketFoods.Controllers.V1
 {
     [Route("api/v{v:apiVersion}/[controller]")]
     [ApiController]
-    [ApiVersion("1")]
+    [ApiVersion("1",Deprecated = true)]
     public class OrderController : ControllerBase
     {
         private static readonly List<CustomerDto> _customers =
